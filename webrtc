@@ -1,0 +1,29 @@
+let pc;
+let localStream;
+let remoteId = null;
+let timerInterval;
+let seconds = 0;
+
+const config = {
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+};
+
+function startTimer() {
+  seconds = 0;
+  document.getElementById("timer").innerText = "00:00";
+
+  timerInterval = setInterval(() => {
+    seconds++;
+
+    let m = String(Math.floor(seconds / 60)).padStart(2, "0");
+    let s = String(seconds % 60).padStart(2, "0");
+
+    document.getElementById("timer").innerText = `${m}:${s}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  seconds = 0;
+  document.getElementById("timer").innerText = "00:00";
+}

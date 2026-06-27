@@ -1,0 +1,36 @@
+async function callUser(id) {
+  remoteId = id;
+
+  localStream = await navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true
+  });
+
+  document.getElementById("local").srcObject = localStream;
+
+  pc = new RTCPeerConnection(config);
+
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+  pc.ontrack = (e) => {
+    document.getElementById("remote").srcObject = e.streams[0];
+  };
+
+  pc.onicecandidate = (e) => {
+    if (e.candidate) {
+      socket.emit("ice-candidate", {
+        to: remoteId,
+        candidate: e.candidate
+      });
+    }
+  };
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  socket.emit("call-user", {
+    to: id,
+    from: socket.id,
+    offer
+  });
+}
